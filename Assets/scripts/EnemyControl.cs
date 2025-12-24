@@ -37,6 +37,7 @@ public class EnemyControl : MonoBehaviour
     {
         if ((col.tag=="PlayerShipTag") || (col.tag == "PlayerBulletTag"))
         {
+            FindFirstObjectByType<GameScore>().AddScore(100);
             PlayExplosion();
             Destroy(gameObject);      
         }

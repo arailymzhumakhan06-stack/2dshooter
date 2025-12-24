@@ -1,13 +1,41 @@
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 using UnityEngine.InputSystem;
 
 public class PlayerControl : MonoBehaviour
 {
-
+    public GameObject GameManagerGO;
     public GameObject PlayerBulletGO;
     public GameObject BulletPosition1;
     public GameObject BulletPosition2;
     public GameObject ExplosionGO;
+
+    private AudioSource shootAudio;
+
+
+    public TMP_Text LivesUIText;
+
+    const int MaxLives = 3;//maximum player lives
+    int lives;//current player lives
+
+
+    void Start()
+    {
+        shootAudio = GetComponent<AudioSource>();
+    }
+
+    public void Init()
+    {
+        lives = MaxLives;
+
+        //update the lives UI text
+        LivesUIText.text = lives.ToString();
+
+        //set this player game object to active gameObject.SetActive (true);
+        gameObject.SetActive(true);
+    }
+
 
     public float speed;
     private Vector2 moveInput;
@@ -19,6 +47,9 @@ public class PlayerControl : MonoBehaviour
             // Instantiate bullets
             Instantiate(PlayerBulletGO, BulletPosition1.transform.position, Quaternion.identity);
             Instantiate(PlayerBulletGO, BulletPosition2.transform.position, Quaternion.identity);
+
+            if (shootAudio != null)
+                shootAudio.Play();
         }
 
         if (Keyboard.current == null) return;
@@ -42,7 +73,15 @@ public class PlayerControl : MonoBehaviour
         if ((col.tag =="EnemyShipTag") || (col.tag == "EnemyBulletTag"))
         {
             PlayExplosion();
-            Destroy(gameObject); //destroy player
+
+            lives--;
+            LivesUIText.text = lives.ToString();
+            if (lives == 0)
+            {
+                gameObject.SetActive(false);
+                GameManagerGO.GetComponent<GameManager>().GameOver();
+            }
+           
         }
     }
 
